@@ -9,8 +9,8 @@
   "scripts": {
     "start": "node ./bin/orwell.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["elastic", "watchers", "open telemetry", "alerts", "observability"],
+  "author": "Edy Silva <edigleyssonsilva@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "commander": "^12.1.0"
