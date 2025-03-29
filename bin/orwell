@@ -71,6 +71,10 @@ program.command('push')
   .option('--base-dir <alerts base dir>', 'Base directory for alerts. Default is src', 'src')
   .option('--main-branch <main branch name>', 'Main branch name. Default is main', 'main')
   .option('--dry-run', 'Dry run the push')
+  .option('--endpoint <endpoint>', 'Elastic endpoint where watchers and scripts will be sent to. Default: ELASTIC_ENDPOINT env var')
+  .option('--api-key <api key>', 'Elastic Api Key to athenticate the request. Default: ELASTIC_API_KEY env var')
+  .option('--username <username>', 'Elastic username to authenticate the request. Default: ELASTIC_USERNAME env var')
+  .option('--password <password>', 'Elastic password to authenticate the request. Default: ELASTIC_PASSWORD env var')
   .action(require('../lib/commands/push'))
 
 program.parse(process.argv);
