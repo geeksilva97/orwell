@@ -1,0 +1,34 @@
+{
+  "trigger": {
+    "schedule": {
+      "interval": "2h"
+    }
+  },
+  "input": {
+    "chain": {
+      "inputs": [
+        {
+          "static": {
+            "simple": {
+              "hello": "Sample of static input that can be added to watch json. Se more at https://www.elastic.co/guide/en/elasticsearch/reference/7.17/input.html"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "condition": {
+    "always" : {}
+  },
+  "transform": {
+    "chain": [
+      {
+        "script": {
+          "id": "{{alertId}}"
+        }
+      }
+    ]
+  },
+  "actions": {
+  }
+}
