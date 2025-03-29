@@ -64,6 +64,14 @@ program.command('scaffold')
     console.log(`Project structure scaffolded successfully at ${alertDir}`);
   });
 
+program.command('push')
+  .description('Push alerts to the server')
+  .option('-b, --diff-branch <diff branch name>', 'Branch to compare with. Default is current branch')
+  .option('--base-dir <alerts base dir>', 'Base directory for alerts. Default is src', 'src')
+  .option('--main-branch <main branch name>', 'Main branch name. Default is main', 'main')
+  .option('--dry-run', 'Dry run the push')
+  .action(require('../lib/commands/push'))
+
 program.parse(process.argv);
 
 function createDirectory(dirPath) {
