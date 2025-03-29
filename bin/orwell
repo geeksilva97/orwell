@@ -25,7 +25,6 @@ program.command('scaffold')
     const server = options.server;
     const name = options.name;
     const dest = options.dest;
-    console.log({options})
 
     if (!name) {
       console.error('Please provide an alert name using -n or --name');
