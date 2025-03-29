@@ -78,7 +78,7 @@ program.command('push')
   .option('--target <target>', 'Pattern to specicy which alerts to pick (e.g. commsplat.non-prod, gopaydev.prod)')
   .action(require('../lib/commands/push'))
 
-require('../lib/commands/eval-javascript=watch')(program);
+require('../lib/commands/eval-javascript-watch')(program);
 
 program.parse(process.argv);
 
