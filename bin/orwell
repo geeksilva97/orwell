@@ -75,6 +75,7 @@ program.command('push')
   .option('--api-key <api key>', 'Elastic Api Key to athenticate the request. Default: ELASTIC_API_KEY env var')
   .option('--username <username>', 'Elastic username to authenticate the request. Default: ELASTIC_USERNAME env var')
   .option('--password <password>', 'Elastic password to authenticate the request. Default: ELASTIC_PASSWORD env var')
+  .option('--target <target>', 'Pattern to specicy which alerts to pick (e.g. commsplat.non-prod, gopaydev.prod)')
   .action(require('../lib/commands/push'))
 
 program.parse(process.argv);
