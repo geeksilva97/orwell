@@ -4,10 +4,10 @@
   "description": "A CLI tool to help you to work with Watcher-based alerts",
   "main": "index.js",
   "bin": {
-    "orwell": "./bin/orwell.js"
+    "orwell": "./bin/orwell"
   },
   "scripts": {
-    "start": "node ./bin/orwell.js"
+    "start": "node ./bin/orwell"
   },
   "keywords": ["elastic", "watchers", "open telemetry", "alerts", "observability"],
   "author": "Edy Silva <edigleyssonsilva@gmail.com>",
