@@ -15,8 +15,8 @@ const fileExists = (filePath) => {
 function parseWatchJSFile(jsCodePath, { alertId, baseDir }, getFileContent = readFileSync) {
   const code = getFileContent(jsCodePath, 'utf8');
   const targetDirectory = baseDir || __dirname
-
   const context = {
+    __dirname: targetDirectory,
     process: {
       env: process.env
     },
@@ -25,7 +25,6 @@ function parseWatchJSFile(jsCodePath, { alertId, baseDir }, getFileContent = rea
 
       return require(resolvedPath);
     },
-    __dirname: targetDirectory,
     script: (scriptPath) => {
       const fullPath = path.resolve(targetDirectory, scriptPath);
       const filename = scriptPath.split('/').pop().split('.').shift();
@@ -58,7 +57,8 @@ function parseWatchJSFile(jsCodePath, { alertId, baseDir }, getFileContent = rea
 
   return {
     watchObject: context.module.exports,
-    scripts: context.scripts
+    scripts: context.scripts,
+    source: code
   };
 }
 
