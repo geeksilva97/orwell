@@ -1,5 +1,5 @@
 {
-  "name": "orwell-cli",
+  "name": "@orwellg/cli",
   "version": "0.0.1",
   "description": "A CLI tool to help you to work with Watcher-based alerts",
   "main": "index.js",
