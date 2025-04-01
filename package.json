@@ -1,6 +1,6 @@
 {
   "name": "@orwellg/cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A CLI tool to help you to work with Watcher-based alerts",
   "main": "index.js",
   "bin": {
@@ -9,10 +9,17 @@
   "scripts": {
     "start": "node ./bin/orwell"
   },
-  "keywords": ["elastic", "watchers", "open telemetry", "alerts", "observability"],
+  "keywords": [
+    "elastic",
+    "watchers",
+    "open telemetry",
+    "alerts",
+    "observability"
+  ],
   "author": "Edy Silva <edigleyssonsilva@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
+    "axios": "^1.8.4",
     "commander": "^12.1.0"
   }
 }
