@@ -88,6 +88,7 @@ program.command('push')
 
 require('../lib/commands/eval-javascript-watch')(program);
 require('../lib/commands/heartbeat')(program);
+require('../lib/commands/sync')(program);
 
 program.parse(process.argv);
 

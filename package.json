@@ -7,7 +7,8 @@
     "orwell": "./bin/orwell"
   },
   "scripts": {
-    "start": "node ./bin/orwell"
+    "start": "node ./bin/orwell",
+    "test": "node --test"
   },
   "keywords": [
     "elastic",
