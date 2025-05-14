@@ -1,9 +1,7 @@
 def watchIds = ctx.payload.env.watchIds;
-// def watcherExecutions = new HashMap();
 def shouldSendMessage = false;
 def watchMessages = new HashMap();
 
-// data = ['item': 'condition | input', 'watchId': watchId, 'execution': execution]
 String buildMessage(String watchId, def execution, String item) {
   def executionResult = execution.result;
 
