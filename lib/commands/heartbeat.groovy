@@ -12,7 +12,7 @@ for (watchId in watchIds) {
     def inputStatus = executionResult.input != null ? executionResult.input.status : '(none)';
     def conditionStatus = executionResult.condition != null ? executionResult.condition.status : '(none)';
 
-    message.add(
+    messages.add(
       String.format(
         "Watch ID %s, Execution state: %s" + newLineChar + "* Input: %s" + newLineChar + "* Condition: %s" + newLineChar + "* Actions: %s",
         new def[] {
