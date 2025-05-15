@@ -1,7 +1,3 @@
-// For some dang reason adding a \n to the string causes the script to crash when uploading the watcher and if we do \\n it does not add the break line, it prints "\\n" in the slack message
-// This hack allows us to bypass the painless compiler and escape the new line correctly
-def newLineChar = (String)(char)0x0a; // reference: https://gist.github.com/vjt/06b28fbd988788c2a7a71c63dd9163be
-
 HashMap buildMarkdown(String text) {
   def mrkdown = new HashMap();
 
@@ -51,8 +47,11 @@ HashMap buildActionButton(String buttonValue, String url) {
 
 // -------
 
+// For some dang reason adding a \n to the string causes the script to crash when uploading the watcher and if we do \\n it does not add the break line, it prints "\\n" in the slack message
+// This hack allows us to bypass the painless compiler and escape the new line correctly
+def newLineChar = (String)(char)0x0a; // reference: https://gist.github.com/vjt/06b28fbd988788c2a7a71c63dd9163be
+
 def watchMessages = ctx.payload.watchMessages;
-def message = new HashMap();
 def messageBlocks = new ArrayList();
 
 def headerBlock = new HashMap();

@@ -1,28 +1,25 @@
-def watchIds = ctx.payload.env.watchIds;
-def shouldSendMessage = false;
-def watchMessages = new HashMap();
-
 String buildMessage(String watchId, def execution, String item) {
   def executionResult = execution.result;
 
-  return String.format(
-    "Watch ID: %s, %s failed: %s, Execution state: %s, Error type: %s, Error reason: %s",
-    new def[] {
-      watchId,
-      item,
-      executionResult[item].status,
-      execution.state,
-      executionResult[item].error.type,
-      executionResult[item].error.reason
-    }
-  );
+  return String.format('Watch ID: %s, %s failed: %s, Execution state: %s, Error type: %s, Error reason: %s', new def[] {
+    watchId, item, executionResult[item].status,
+    execution.state,
+    executionResult[item].error.type,
+    executionResult[item].error.reason
+  });
 }
+
+def watchIds = ctx.payload.env.watchIds;
+def shouldSendMessage = false;
+def watchMessages = new HashMap();
 
 for (watchId in watchIds) {
   def messages = [];
   def executions = ctx.payload[watchId].hits.hits;
 
-  for (execution in executions) {
+  for (e in executions) {
+    def execution = e._source;
+
     if (execution.state == 'execution_not_needed') continue;
 
     def executionResult = execution.result;
