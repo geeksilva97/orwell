@@ -17,6 +17,6 @@ module.exports = {
       }
     },
     indices: 'watcher-history',
-    interval: '1h',
+    interval: '2h',
   }
 };
