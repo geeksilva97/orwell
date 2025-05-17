@@ -6,14 +6,8 @@ module.exports = {
       'in-person-selling/shipping-release-scanner',
     ],
     action: {
-      webhook: {
-        scheme: "https",
-        host: "hooks.slack.com",
-        port: 443,
-        method: "post",
+      slack: {
         path: process.env.SLACK_HOOK_PATH,
-        params: {},
-        headers: {},
       }
     },
     indices: 'watcher-history',
