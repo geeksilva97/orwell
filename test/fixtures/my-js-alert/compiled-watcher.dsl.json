@@ -1,0 +1,106 @@
+{
+  "trigger": {
+    "schedule": {
+      "interval": "2h"
+    }
+  },
+  "input": {
+    "chain": {
+      "inputs": [
+        {
+          "static": {
+            "simple": {
+              "watchUrl": "https://example.com/watcher/status",
+              "timeWindowInMinutes": 120,
+              "env": "NON-PROD"
+            }
+          }
+        },
+        {
+          "logs": {
+            "search": {
+              "request": {
+                "search_type": "query_then_fetch",
+                "indices": [
+                  "eks-*"
+                ],
+                "rest_total_hits_as_int": true,
+                "body": {
+                  "query": {
+                    "bool": {
+                      "filter": [
+                        {
+                          "range": {
+                            "@timestamp": {
+                              "gte": "{{ctx.trigger.scheduled_time}}||-2h",
+                              "lte": "{{ctx.trigger.scheduled_time}}",
+                              "format": "strict_date_optional_time||epoch_millis"
+                            }
+                          }
+                        },
+                        {
+                          "match_phrase": {
+                            "message": {
+                              "query": "Failed to create reconext order",
+                              "slop": 10
+                            }
+                          }
+                        },
+                        {
+                          "bool": {
+                            "should": [
+                              {
+                                "match_phrase": {
+                                  "kubernetes.pod_name": "ips-hermes"
+                                }
+                              }
+                            ],
+                            "minimum_should_match": 1
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "sort": {
+                    "@timestamp": {
+                      "order": "desc"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "condition": {
+    "compare": {
+      "ctx.payload.logs.hits.total": {
+        "gt": 0
+      }
+    }
+  },
+  "transform": {
+    "script": {
+      "id": "my-js-alert-transform"
+    }
+  },
+  "actions": {
+    "send_slack_message": {
+      "transform": {
+        "script": {
+          "id": "my-js-alert-transform"
+        }
+      },
+      "webhook": {
+        "scheme": "https",
+        "host": "hooks.slack.com",
+        "port": 443,
+        "method": "post",
+        "path": "{{ctx.payload.slackHookPath}}",
+        "body": "{{#toJson}}ctx.payload.message{{/toJson}}"
+      }
+    }
+  }
+}

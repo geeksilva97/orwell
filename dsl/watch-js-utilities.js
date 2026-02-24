@@ -1,6 +1,8 @@
 const vm = require('node:vm');
 const path = require('node:path');
 const { readFileSync, accessSync, constants } = require('node:fs');
+const { WatcherBuilder } = require('./watcher-builder');
+const { createDSLGlobals } = require('./dsl-globals');
 
 const fileExists = (filePath) => {
   try {
@@ -15,6 +17,9 @@ const fileExists = (filePath) => {
 function parseWatchJSFile(jsCodePath, { alertId, baseDir }, getFileContent = readFileSync) {
   const code = getFileContent(jsCodePath, 'utf8');
   const targetDirectory = baseDir || __dirname
+  const builder = new WatcherBuilder();
+  const dslGlobals = createDSLGlobals(builder);
+
   const context = {
     __dirname: targetDirectory,
     process: {
@@ -49,14 +54,18 @@ function parseWatchJSFile(jsCodePath, { alertId, baseDir }, getFileContent = rea
     },
     module: {
       exports: {}
-    }
+    },
+    ...dslGlobals,
   };
 
   vm.createContext(context);
   vm.runInNewContext(code, context);
 
+  const exportsEmpty = Object.keys(context.module.exports).length === 0;
+  const usedDSL = exportsEmpty && builder.hasState();
+
   return {
-    watchObject: context.module.exports,
+    watchObject: usedDSL ? builder.compile() : context.module.exports,
     scripts: context.scripts,
     source: code
   };
