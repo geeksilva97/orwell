@@ -115,15 +115,22 @@ Evaluate a JavaScript watcher file and print the resulting JSON. Useful for debu
 orwell eval:watch <path-to-watcher.js> --project-id <id>
 ```
 
-### `heartbeat:make`
+### `heartbeat:deploy`
 
-Generate a heartbeat watcher that monitors other watchers and sends Slack notifications when they stop firing.
+Build and deploy the heartbeat watcher directly to Elasticsearch.
 
 ```bash
-orwell heartbeat:make --base-dir src --config-path ./orwell.js
+orwell heartbeat:deploy \
+  --base-dir src \
+  --config-path ./orwell.js \
+  --endpoint <url> \
+  --api-key <key> \
+  --dry-run                      # preview without deploying
 ```
 
-Requires an `orwell.js` config file (see [Configuration](#configuration)).
+The watcher ID is derived from the project ID: `{projectId}-heartbeat` (or `orwell-heartbeat` if no project ID is set). Supports `--dry-run` to print the watcher JSON without deploying.
+
+Authentication options are the same as `push` and `sync` (`--api-key`, `--username`/`--password`, or the corresponding env vars).
 
 ## Folder structure
 
@@ -196,21 +203,21 @@ The `script()` function is globally available in JS watchers. It takes a path to
 
 ## Configuration
 
-The `orwell.js` config file is used by the `heartbeat:make` command:
+The `orwell.js` config file is used by the `heartbeat:deploy` command:
 
 ```javascript
 module.exports = {
   baseDir: 'src',
   heartbeat: {
+    projectId: 'my-project',       // optional, prefixes alert and watcher IDs
     alerts: [
       'in-person-selling/reconext-shipment-failure',
       'in-person-selling/shipping-release-scanner',
     ],
     action: {
-      slack: { path: process.env.SLACK_HOOK_PATH },
-      webhook: { /* ... */ }
+      slack: { path: process.env.SLACK_HOOK_PATH }
     },
-    indices: '.watcher-history',
+    indices: ['.watcher-history-*'],
     interval: '2h',
   }
 };
@@ -246,7 +253,17 @@ export ELASTIC_PASSWORD=pass
 npm test
 ```
 
-Uses the Node.js built-in test runner.
+Uses the Node.js built-in test runner (`node --test`).
+
+### Integration tests
+
+Integration tests deploy real watchers to a local Elasticsearch instance:
+
+```bash
+docker-compose up -d          # starts ES on localhost:19200 + Kibana on localhost:15601
+npm test                      # runs all tests including integration
+docker-compose down
+```
 
 ## License
 
