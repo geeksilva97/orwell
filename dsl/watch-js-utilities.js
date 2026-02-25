@@ -3,6 +3,7 @@ const path = require('node:path');
 const { readFileSync, accessSync, constants } = require('node:fs');
 const { WatcherBuilder } = require('./watcher-builder');
 const { createDSLGlobals } = require('./dsl-globals');
+const makeMarkdown = require('./watchjs-functions/markdown');
 
 const fileExists = (filePath) => {
   try {
@@ -19,6 +20,8 @@ function parseWatchJSFile(jsCodePath, { alertId, baseDir }, getFileContent = rea
   const targetDirectory = baseDir || __dirname
   const builder = new WatcherBuilder();
   const dslGlobals = createDSLGlobals(builder);
+
+  const markdown = makeMarkdown({ targetDirectory });
 
   const context = {
     __dirname: targetDirectory,
@@ -47,6 +50,7 @@ function parseWatchJSFile(jsCodePath, { alertId, baseDir }, getFileContent = rea
 
       return { id: scriptId };
     },
+    markdown,
     scripts: {},
     console: {
       log: console.log,

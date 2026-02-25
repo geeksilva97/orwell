@@ -56,4 +56,41 @@ describe('watch-js-utilities', () => {
     const foundScripts = Object.keys(scripts);
     t.assert.ok(foundScripts.includes('my-js-alert-transform'));
   });
+
+  it('parses a DSL watcher with markdown message and compiles body as JSON string', (t) => {
+    const jsCodePath = path.resolve(__dirname, '../test/fixtures/markdown-alert/watcher.dsl.js');
+    const { watchObject } = parseWatchJSFile(jsCodePath, {
+      alertId: 'markdown-alert',
+      baseDir: path.resolve(__dirname, '../test/fixtures/markdown-alert'),
+    });
+
+    const normalized = normalize(watchObject);
+    const webhook = normalized.actions.send_slack_message.webhook;
+
+    t.assert.strictEqual(typeof webhook.body, 'string');
+    t.assert.deepStrictEqual(webhook.headers, { 'Content-Type': 'application/json' });
+
+    const parsed = JSON.parse(webhook.body);
+    t.assert.ok(Array.isArray(parsed.blocks));
+
+    // header with mustache placeholder
+    t.assert.strictEqual(parsed.blocks[0].type, 'header');
+    t.assert.strictEqual(parsed.blocks[0].text.text, '{{ctx.payload.count}} Failures Detected');
+
+    // section with bold mustache
+    t.assert.strictEqual(parsed.blocks[1].type, 'section');
+    t.assert.ok(parsed.blocks[1].text.text.includes('*{{ctx.payload.service}}*'));
+
+    // divider
+    const dividers = parsed.blocks.filter((b) => b.type === 'divider');
+    t.assert.strictEqual(dividers.length, 1);
+
+    // actions and context from options
+    const actions = parsed.blocks.filter((b) => b.type === 'actions');
+    t.assert.strictEqual(actions.length, 1);
+    t.assert.strictEqual(actions[0].elements[0].url, '{{ctx.payload.logsUrl}}');
+
+    const context = parsed.blocks.filter((b) => b.type === 'context');
+    t.assert.strictEqual(context.length, 1);
+  });
 });

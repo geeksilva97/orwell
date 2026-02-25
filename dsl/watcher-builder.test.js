@@ -2,6 +2,7 @@ const { describe, it } = require('node:test');
 const { WatcherBuilder } = require('./watcher-builder');
 const { gt, gte } = require('./comparison-operators');
 const { query, rawQuery, isOneOf } = require('./query-compiler');
+const { MARKDOWN_TAG } = require('./watchjs-functions/markdown');
 
 describe('WatcherBuilder', () => {
   describe('hasState', () => {
@@ -213,6 +214,64 @@ describe('WatcherBuilder', () => {
       });
       const result = builder.compile();
       t.assert.ok(result.actions.send_slack_message);
+    });
+
+    it('sets webhook body and headers from markdown message', (t) => {
+      const builder = new WatcherBuilder();
+      const message = {
+        [MARKDOWN_TAG]: true,
+        blocks: [
+          { type: 'header', text: { type: 'plain_text', text: '{{ctx.payload.count}} Failures', emoji: true } },
+          { type: 'section', text: { type: 'mrkdwn', text: 'Something went wrong' } },
+        ],
+      };
+      builder.addWebhookAction({
+        name: 'notify',
+        message,
+        configs: {
+          scheme: 'https',
+          host: 'hooks.slack.com',
+          port: 443,
+          method: 'post',
+        },
+      });
+      const result = builder.compile();
+      const webhook = result.actions.notify.webhook;
+
+      t.assert.strictEqual(typeof webhook.body, 'string');
+      const parsed = JSON.parse(webhook.body);
+      t.assert.strictEqual(parsed.blocks.length, 2);
+      t.assert.strictEqual(parsed.blocks[0].text.text, '{{ctx.payload.count}} Failures');
+      t.assert.deepStrictEqual(webhook.headers, { 'Content-Type': 'application/json' });
+    });
+
+    it('markdown message coexists with transform', (t) => {
+      const builder = new WatcherBuilder();
+      const message = {
+        [MARKDOWN_TAG]: true,
+        blocks: [{ type: 'section', text: { type: 'mrkdwn', text: 'Hello' } }],
+      };
+      builder.addWebhookAction({
+        name: 'notify',
+        message,
+        transform: { id: 'my-transform' },
+        configs: { host: 'hooks.slack.com' },
+      });
+      const result = builder.compile();
+      const action = result.actions.notify;
+
+      t.assert.ok(action.transform);
+      t.assert.ok(action.webhook.body);
+      t.assert.deepStrictEqual(action.transform, { script: { id: 'my-transform' } });
+    });
+
+    it('does not set body when no message is provided', (t) => {
+      const builder = new WatcherBuilder();
+      builder.addWebhookAction({
+        configs: { host: 'example.com' },
+      });
+      const result = builder.compile();
+      t.assert.strictEqual(result.actions.send_slack_message.webhook.body, undefined);
     });
   });
 
