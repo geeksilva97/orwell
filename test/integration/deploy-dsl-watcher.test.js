@@ -14,6 +14,7 @@ const ALERT_ID = 'integration-test-alert';
 const SCRIPT_ID = `${ALERT_ID}-transform`;
 const TEST_INDEX = 'orwell-integration-test-logs';
 const FIXTURES_DIR = path.resolve(__dirname, 'fixtures');
+const SKIP_CLEANUP = process.env.SKIP_CLEANUP === 'true';
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -63,6 +64,7 @@ describe('DSL watcher integration', () => {
   });
 
   after(async () => {
+    if (SKIP_CLEANUP) return;
     try { await esClient.delete(`/_watcher/watch/${ALERT_ID}`); } catch { /* ignore */ }
     try { await esClient.delete(`/_scripts/${SCRIPT_ID}`); } catch { /* ignore */ }
     try { await esClient.delete(`/${TEST_INDEX}`); } catch { /* ignore */ }
@@ -106,12 +108,79 @@ describe('DSL watcher integration', () => {
 
     // 5. GET /_watcher/watch/integration-test-alert
     const { data, status } = await esClient.get(`/_watcher/watch/${ALERT_ID}`);
+    const watch = data.watch;
 
-    // 6. Assert: stored correctly
+    // 6. Assert: every section matches the compiled DSL output
     t.assert.strictEqual(status, 200);
-    t.assert.ok(data.watch.trigger);
-    t.assert.ok(data.watch.input);
-    t.assert.ok(data.watch.condition);
+
+    t.assert.deepStrictEqual(watch.trigger, {
+      schedule: { interval: '1h' },
+    });
+
+    t.assert.deepStrictEqual(watch.condition, {
+      compare: { 'ctx.payload.logs.hits.total': { gt: 0 } },
+    });
+
+    t.assert.deepStrictEqual(watch.transform, {
+      script: { id: 'integration-test-alert-transform' },
+    });
+
+    // input chain: watchEnvs (injected by deploy service), static fields, logs search
+    const inputs = watch.input.chain.inputs;
+    t.assert.strictEqual(inputs.length, 3);
+
+    t.assert.deepStrictEqual(inputs[0], {
+      watchEnvs: { simple: {} },
+    });
+
+    t.assert.deepStrictEqual(inputs[1], {
+      static: { simple: { env: 'integration-test' } },
+    });
+
+    const logsSearch = inputs[2].logs.search.request;
+    t.assert.deepStrictEqual(logsSearch.indices, ['orwell-integration-test-logs']);
+    t.assert.strictEqual(logsSearch.rest_total_hits_as_int, true);
+    t.assert.deepStrictEqual(logsSearch.body.query, {
+      bool: {
+        filter: [
+          {
+            range: {
+              '@timestamp': {
+                gte: '{{ctx.trigger.scheduled_time}}||-24h',
+                lte: '{{ctx.trigger.scheduled_time}}',
+                format: 'strict_date_optional_time||epoch_millis',
+              },
+            },
+          },
+          {
+            match_phrase: {
+              message: { query: 'Failed to create reconext order', slop: 10 },
+            },
+          },
+          {
+            bool: {
+              should: [{ match_phrase: { 'kubernetes.pod_name': 'ips-hermes' } }],
+              minimum_should_match: 1,
+            },
+          },
+        ],
+      },
+    });
+
+    // actions: webhook with ES-added defaults (params, headers)
+    t.assert.deepStrictEqual(watch.actions, {
+      notify: {
+        webhook: {
+          scheme: 'https',
+          host: 'localhost',
+          port: 9999,
+          method: 'post',
+          path: '/noop',
+          params: {},
+          headers: {},
+        },
+      },
+    });
   });
 
   it('triggers from matching logs and condition evaluates to met', async (t) => {
@@ -126,7 +195,11 @@ describe('DSL watcher integration', () => {
     // 2. Condition should be met because we indexed matching docs
     t.assert.strictEqual(result.condition.met, true);
 
-    // 3. The search input should have found our 3 documents
-    t.assert.ok(result.input.payload.logs.hits.total >= 3);
+    // 3. The search input should have found exactly our 3 documents
+    t.assert.strictEqual(result.input.payload.logs.hits.total, 3);
+
+    // 4. The webhook action was simulated, not actually fired
+    t.assert.strictEqual(result.actions[0].id, 'notify');
+    t.assert.strictEqual(result.actions[0].status, 'simulated');
   });
 });

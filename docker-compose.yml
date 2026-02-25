@@ -12,3 +12,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 30
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.17.0
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - xpack.security.enabled=false
+    ports:
+      - "15601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
