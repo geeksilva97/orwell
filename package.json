@@ -6,6 +6,12 @@
   "bin": {
     "orwell": "./bin/orwell.ts"
   },
+  "files": [
+    "bin/",
+    "lib/",
+    "dsl/",
+    "README.md"
+  ],
   "scripts": {
     "start": "node ./bin/orwell.ts",
     "test": "node --test '**/*.test.ts'",
