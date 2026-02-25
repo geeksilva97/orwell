@@ -2,13 +2,14 @@
   "name": "@orwellg/cli",
   "version": "0.1.0",
   "description": "A CLI tool to help you to work with Watcher-based alerts",
-  "main": "index.js",
+  "type": "module",
   "bin": {
-    "orwell": "./bin/orwell"
+    "orwell": "./bin/orwell.ts"
   },
   "scripts": {
-    "start": "node ./bin/orwell",
-    "test": "node --test '**/*.test.js'"
+    "start": "node ./bin/orwell.ts",
+    "test": "node --test '**/*.test.ts'",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "elastic",
@@ -24,5 +25,10 @@
     "commander": "^12.1.0",
     "marked": "^15.0.8",
     "mustache": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/mustache": "^4.2.5",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
   }
 }
