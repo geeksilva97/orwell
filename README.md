@@ -15,17 +15,17 @@ Or run locally from the repo:
 ```bash
 git clone <repo-url> && cd orwell
 npm install
-node ./bin/orwell --version
+node ./bin/orwell.ts --version
 ```
 
-Requires Node.js >= 22.
+Requires Node.js >= 24.
 
 ## Quick start
 
 Scaffold a new alert project:
 
 ```bash
-orwell scaffold --server server-a --name my-alert
+orwell scaffold --name my-alert
 ```
 
 This creates:
@@ -34,7 +34,7 @@ This creates:
 src/
   alert-group/
     my-alert/
-      watcher.server-a.non-prod.json
+      watcher.non-prod.json
       script.groovy
   shared/
     shared.groovy
@@ -68,8 +68,7 @@ Create a new alert project with the right folder structure.
 
 ```bash
 orwell scaffold \
-  --server <server-name> \
-  --name <alert-name> \
+  -n, --name <alert-name> \
   -g, --group-name <group>    # default: alert-group
   --base-dir <dir>             # default: src
   --dest <dir>                 # default: current directory
