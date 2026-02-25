@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node ./bin/orwell",
-    "test": "node --test"
+    "test": "node --test '**/*.test.js'"
   },
   "keywords": [
     "elastic",

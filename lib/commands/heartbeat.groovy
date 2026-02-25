@@ -8,11 +8,23 @@ for (watchId in watchIds) {
   def messages = [];
   def executions = ctx.payload[watchId].hits.hits;
 
+  if (executions.size() > 0) {
+    shouldSendMessage = true;
+  }
+
   for (e in executions) {
     def execution = e._source;
     def executionResult = execution.result;
     def inputStatus = executionResult.input != null ? executionResult.input.status : '(none)';
     def conditionStatus = executionResult.condition != null ? executionResult.condition.status : '(none)';
+
+    def actionStatuses = [];
+    if (executionResult.actions != null) {
+      for (a in executionResult.actions) {
+        actionStatuses.add(a.id + ':' + a.status);
+      }
+    }
+    def actionsStatus = actionStatuses.size() > 0 ? String.join(', ', actionStatuses) : '(none)';
 
     messages.add(
       String.format(
@@ -21,7 +33,7 @@ for (watchId in watchIds) {
           execution.state,
           inputStatus,
           conditionStatus,
-          'not implemented'
+          actionsStatus
         }
       )
     );
@@ -31,6 +43,6 @@ for (watchId in watchIds) {
 }
 
 return [
-  'shouldSendMessage': true,
+  'shouldSendMessage': shouldSendMessage,
   'watchMessages': watchMessages
 ];
