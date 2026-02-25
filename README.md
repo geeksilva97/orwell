@@ -4,6 +4,8 @@ A command-line tool for managing Elasticsearch Watcher alerts as code.
 
 Orwell lets you define, version-control, and deploy watcher-based alerts to Elasticsearch from your terminal. Instead of clicking through Kibana, you keep alert definitions in your repo and push changes through git.
 
+**Documentation:** [orwell.pages.dev](https://orwell.pages.dev)
+
 ## Install
 
 ```bash
