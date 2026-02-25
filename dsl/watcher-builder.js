@@ -1,5 +1,6 @@
 const { isComparison } = require('./comparison-operators');
 const { isQuery, isRawQuery, compileQuery } = require('./query-compiler');
+const { isMarkdownMessage } = require('./watchjs-functions/markdown');
 
 class WatcherBuilder {
   constructor() {
@@ -38,7 +39,7 @@ class WatcherBuilder {
     this._transforms.push(spec);
   }
 
-  addWebhookAction({ name, transform, throttle_period, configs }) {
+  addWebhookAction({ name, transform, throttle_period, configs, message }) {
     const action = {};
 
     if (throttle_period) {
@@ -50,6 +51,11 @@ class WatcherBuilder {
     }
 
     action.webhook = configs;
+
+    if (message && isMarkdownMessage(message)) {
+      action.webhook.body = JSON.stringify({ blocks: message.blocks });
+      action.webhook.headers = { 'Content-Type': 'application/json' };
+    }
 
     this._actions[name || 'send_slack_message'] = action;
   }
