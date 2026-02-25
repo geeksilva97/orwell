@@ -14,10 +14,10 @@ Or run directly from source:
 ```bash
 git clone <repo-url> && cd orwell
 npm install
-node ./bin/orwell --version
+node ./bin/orwell.ts --version
 ```
 
-Requires **Node.js >= 22**.
+Requires **Node.js >= 24**.
 
 ---
 

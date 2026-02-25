@@ -20,14 +20,14 @@ Accepts all options from [`push`](/commands/push/), plus:
 | `--remove-only` | | Only delete watchers, skip push |
 | `--push-only` | | Only push changed alerts, skip deletion |
 
-`--remove-only` and `--push-only` are mutually exclusive.
+If both `--remove-only` and `--push-only` are set at the same time, they cancel each other out and a full sync runs.
 
 ## How it works
 
 Without flags, `sync` runs both phases:
 
 1. **Push phase** — identical to [`push`](/commands/push/): detects changed alerts via `git diff` and deploys them.
-2. **Remove phase** — lists all watchers in Elasticsearch whose IDs match the project prefix, then deletes any that no longer exist on disk.
+2. **Remove phase** — uses `git diff` to find alert files that were **deleted from the repository**, then removes the corresponding watchers from Elasticsearch.
 
 ## Examples
 
