@@ -1,0 +1,36 @@
+---
+title: Orwell
+description: CLI for managing Elasticsearch Watcher alerts as code.
+template: splash
+hero:
+  tagline: Elasticsearch Watcher alerts — defined in code, deployed by git diff.
+  actions:
+    - text: Get started
+      link: /getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/geeksilva97/orwell
+      icon: external
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Why Orwell?
+
+Clicking through Kibana to manage watchers doesn't scale. Orwell lets you keep alert definitions in your repository and deploy them the same way you deploy code.
+
+<CardGrid stagger>
+  <Card title="Git-diff deploys" icon="git-branch">
+    Only changed alerts are pushed. Orwell compares your branch against `main` and deploys the diff.
+  </Card>
+  <Card title="JavaScript DSL" icon="document">
+    Write watchers in plain JavaScript with a concise DSL. Reference Groovy scripts, build queries, and compile Markdown to Slack Block Kit messages.
+  </Card>
+  <Card title="Target any server/env" icon="setting">
+    Name your watcher files `watcher.server-a.non-prod.js` and Orwell routes them automatically. No environment variables or flags needed at definition time.
+  </Card>
+  <Card title="Heartbeat monitoring" icon="heart">
+    Deploy a heartbeat watcher that polls your other watchers and fires a Slack alert if any go missing from the execution history.
+  </Card>
+</CardGrid>

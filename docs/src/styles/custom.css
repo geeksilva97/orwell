@@ -1,0 +1,12 @@
+/* Custom accent color to give the docs a distinct identity */
+:root {
+  --sl-color-accent-low: #1a2f3a;
+  --sl-color-accent: #2a7d9e;
+  --sl-color-accent-high: #7ecfee;
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #d4edf7;
+  --sl-color-accent: #1a6d8a;
+  --sl-color-accent-high: #0d4a60;
+}
