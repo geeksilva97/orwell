@@ -1,4 +1,4 @@
-const { webhook } = require('./base')
+const { webhook } = require('./base.cjs')
   ;
 const transformScript = script('../test/fixtures/my-js-alert/transform.groovy')
 
