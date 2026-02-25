@@ -40,6 +40,27 @@ describe('diff-alerts', () => {
   });
 
   describe('getAlertsToSync', () => {
+    it('ignores deleted alerts outside the tracked dirs', (t: TestContext) => {
+      const findAlertByPathMock = mock.fn<(path: string) => Alert | null>(() => null);
+
+      const [updated, deleted] = getAlertsToSync({
+        baseDir: 'src',
+        dirs: ['src/payments-hub'],
+        diffFunction: () => ({
+          updated: [],
+          deleted: [
+            'src/in-person-selling/some-alert/watcher.json',
+          ]
+        }),
+        alertRepository: {
+          findAlertByPath: findAlertByPathMock
+        }
+      });
+
+      t.assert.deepStrictEqual(updated, []);
+      t.assert.deepStrictEqual(deleted, []);
+    });
+
     it('collects updated alerts', (t: TestContext) => {
       const findAlertByPathMock = mock.fn<(path: string) => string>((path) => {
         const split = path.split('/').slice(0, 3);

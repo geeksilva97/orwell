@@ -136,8 +136,6 @@ export const getAlertsToSync = ({ baseDir, dirs, diffFunction, alertRepository, 
     return alertsMap;
   }, {});
 
-  console.log(alertsToDelete);
-
   return [
     Object.values(result).filter((v): v is Alert => v != null),
     Object.values(alertsToDelete)
