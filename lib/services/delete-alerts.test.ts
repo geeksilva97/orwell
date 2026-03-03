@@ -1,5 +1,6 @@
 import { makeDeleteAlertsService } from './delete-alerts.ts';
 import { AlertFactory } from '../core/alert-factory.ts';
+import type { Alert } from '../core/alert.ts';
 import { describe, it, mock } from 'node:test';
 import type { TestContext } from 'node:test';
 
@@ -15,7 +16,7 @@ const makeAlert = (id: string) => AlertFactory.build({
 describe('delete-alerts', () => {
   describe('execute', () => {
     it('returns empty array when there are no alerts', async (t: TestContext) => {
-      const watchDeployer = { remove: mock.fn<() => Promise<boolean>>(() => Promise.resolve(true)) };
+      const watchDeployer = { remove: mock.fn<(alert: Alert | { id: string }) => Promise<boolean>>(() => Promise.resolve(true)) };
 
       const service = makeDeleteAlertsService({
         alerts: [],
@@ -32,7 +33,7 @@ describe('delete-alerts', () => {
     it('calls remove for each alert', async (t: TestContext) => {
       const alert1 = makeAlert('group-alert-1');
       const alert2 = makeAlert('group-alert-2');
-      const watchDeployer = { remove: mock.fn<() => Promise<boolean>>(() => Promise.resolve(true)) };
+      const watchDeployer = { remove: mock.fn<(alert: Alert | { id: string }) => Promise<boolean>>(() => Promise.resolve(true)) };
 
       const service = makeDeleteAlertsService({
         alerts: [alert1, alert2],
@@ -53,7 +54,7 @@ describe('delete-alerts', () => {
       const alert3 = makeAlert('group-alert-3');
       let callCount = 0;
       const watchDeployer = {
-        remove: mock.fn<() => Promise<boolean>>(() => {
+        remove: mock.fn<(alert: Alert | { id: string }) => Promise<boolean>>(() => {
           // first returns true, second false, third true
           const results = [true, false, true];
           return Promise.resolve(results[callCount++] ?? false);

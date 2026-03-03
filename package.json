@@ -15,6 +15,7 @@
   "scripts": {
     "start": "node ./bin/orwell.ts",
     "test": "node --test '**/*.test.ts'",
+    "test:unit": "node --test 'lib/**/*.test.ts' 'dsl/**/*.test.ts'",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [
