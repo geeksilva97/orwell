@@ -28,7 +28,7 @@ function buildVMContext(
   builder: WatcherBuilder
 ): { context: vm.Context; scripts: Record<string, ScriptReference> } {
   const scripts: Record<string, ScriptReference> = {};
-  const req = createRequire(path.resolve(targetDirectory, 'dummy.js'));
+  const req = createRequire(path.resolve(targetDirectory, '_'));
 
   const context: Record<string, unknown> = {
     __dirname: targetDirectory,
